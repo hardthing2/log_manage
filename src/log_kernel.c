@@ -11,10 +11,11 @@ unsigned int major;
 dev_t devno;
 struct class *cls = {0};
 char *shared_mem = NULL;
+int len = 0;
 
 int log_write(char *content)
 {
-
+	len += sprintf(shared_mem + len,"%s\n\r",content);
         return 0;
 }
 
@@ -31,7 +32,7 @@ static int dipper_map(struct file *fd, struct vm_area_struct *vma)
         unsigned long page;
         page = virt_to_phys(shared_mem);
         remap_pfn_range(vma, (unsigned long)vma->vm_start, page>>PAGE_SHIFT, (unsigned long)(vma->vm_end - vma->vm_start), PAGE_SHARED);
-        *shared_mem = 100;
+        
         return 0;
 }
 
@@ -74,7 +75,7 @@ static void log_exit(void)
 
 
 
-
+EXPORT_SYMBOL(log_write);
 MODULE_LICENSE("GPL");
 module_init(log_init);
 module_exit(log_exit);
